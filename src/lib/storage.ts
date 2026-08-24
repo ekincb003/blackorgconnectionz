@@ -69,14 +69,20 @@ export function loadStoredData(): AppState {
   }
 }
 
+import { supabase } from './supabaseClient';
+
 export async function fetchServerData(): Promise<AppState | null> {
   if (typeof window === 'undefined') return null;
+  // 1. Try Supabase Cloud Database
   try {
-    const res = await fetch('/api/data', { cache: 'no-store' });
-    if (!res.ok) return null;
-    const json = await res.json();
-    if (json.success && json.data) {
-      const d = json.data;
+    const { data, error } = await supabase
+      .from('platform_state')
+      .select('data')
+      .eq('id', 'main')
+      .single();
+
+    if (data && data.data) {
+      const d = data.data;
       return {
         users: d.users || INITIAL_USERS,
         orgs: d.organizations || INITIAL_ORGS,
@@ -85,6 +91,27 @@ export async function fetchServerData(): Promise<AppState | null> {
         claimRequests: d.claimRequests || INITIAL_CLAIM_REQUESTS,
         notifications: d.notifications || INITIAL_NOTIFICATIONS
       };
+    }
+  } catch (err) {
+    // Fallback to /api/data
+  }
+
+  // 2. Fallback to /api/data
+  try {
+    const res = await fetch('/api/data', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
+        return {
+          users: d.users || INITIAL_USERS,
+          orgs: d.organizations || INITIAL_ORGS,
+          messages: d.messages || INITIAL_MESSAGES,
+          groupChats: d.groupChats || INITIAL_GROUP_CHATS,
+          claimRequests: d.claimRequests || INITIAL_CLAIM_REQUESTS,
+          notifications: d.notifications || INITIAL_NOTIFICATIONS
+        };
+      }
     }
   } catch (err) {
     console.error('Error fetching server data:', err);
@@ -102,6 +129,37 @@ export function syncToServer(data: Partial<{
   appLogo: string;
 }>) {
   if (typeof window === 'undefined') return;
+
+  // 1. Real-time sync to Supabase
+  try {
+    const local = loadStoredData();
+    const mergedPayload = {
+      users: data.users || local.users,
+      organizations: data.organizations || local.orgs,
+      messages: data.messages || local.messages,
+      groupChats: data.groupChats || local.groupChats,
+      claimRequests: data.claimRequests || local.claimRequests,
+      notifications: data.notifications || local.notifications,
+      appLogo: data.appLogo || localStorage.getItem('boc_app_logo')
+    };
+
+    supabase
+      .from('platform_state')
+      .upsert({
+        id: 'main',
+        data: mergedPayload,
+        updated_at: new Date().toISOString()
+      })
+      .then(({ error }) => {
+        if (error) {
+          console.warn('Supabase sync notice:', error.message);
+        }
+      });
+  } catch (err) {
+    console.warn('Supabase sync error:', err);
+  }
+
+  // 2. Local backend sync
   fetch('/api/data', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
