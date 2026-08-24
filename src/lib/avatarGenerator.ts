@@ -60,6 +60,42 @@ export function generateMonogramDataUrl(options: MonogramOptions): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+export function generateChapterBannerSvg(orgName: string, subText: string, primaryColor: string, secondaryColor: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 450" width="1400" height="450">
+    <defs>
+      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${primaryColor}" stop-opacity="0.95" />
+        <stop offset="50%" stop-color="#0e1017" stop-opacity="0.98" />
+        <stop offset="100%" stop-color="${primaryColor}" stop-opacity="0.9" />
+      </linearGradient>
+      <linearGradient id="textGold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF" />
+        <stop offset="50%" stop-color="${secondaryColor || '#D4AF37'}" />
+        <stop offset="100%" stop-color="#FFF2A3" />
+      </linearGradient>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.7" />
+      </filter>
+    </defs>
+    <rect width="1400" height="450" fill="url(#bgGrad)" />
+    <!-- Collegiate geometric accents -->
+    <rect x="25" y="25" width="1350" height="400" rx="24" fill="none" stroke="${secondaryColor || '#D4AF37'}" stroke-width="2.5" stroke-opacity="0.35" stroke-dasharray="12,8" />
+    <circle cx="120" cy="225" r="140" fill="${primaryColor}" opacity="0.15" />
+    <circle cx="1280" cy="225" r="140" fill="${secondaryColor || '#D4AF37'}" opacity="0.08" />
+    
+    <!-- Big Organization Name Text -->
+    <text x="50%" y="42%" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="900" fill="url(#textGold)" text-anchor="middle" dominant-baseline="central" letter-spacing="4" filter="url(#shadow)">
+      ${orgName.toUpperCase()}
+    </text>
+    
+    <!-- Subtitle / Chapter Motto -->
+    <text x="50%" y="68%" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="700" fill="#E5E7EB" text-anchor="middle" dominant-baseline="central" letter-spacing="3" opacity="0.9" filter="url(#shadow)">
+      ${subText.toUpperCase()}
+    </text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export const CURATED_BANNER_LIBRARY = [
   {
     category: 'Collegiate & Campus Life',
