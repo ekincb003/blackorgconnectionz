@@ -31,7 +31,14 @@ import {
   resetAllDataToDefault
 } from '../lib/storage';
 import { DEFAULT_APP_LOGO_SVG } from '../lib/defaultAppLogo';
-import { sortOrganizationsByFounding } from '../lib/seedData';
+import {
+  sortOrganizationsByFounding,
+  INITIAL_ORGS,
+  INITIAL_MESSAGES,
+  INITIAL_GROUP_CHATS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_CLAIM_REQUESTS
+} from '../lib/seedData';
 import { useAuth } from './AuthContext';
 
 interface DataContextType {
@@ -128,13 +135,13 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const { currentUser, users, updateProfile, getUserById, deleteUserPermanently } = useAuth();
-  const [orgs, setOrgs] = useState<Organization[]>([]);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
-  const [claimRequests, setClaimRequests] = useState<ClaimRequest[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [orgs, setOrgs] = useState<Organization[]>(() => sortOrganizationsByFounding(INITIAL_ORGS));
+  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [groupChats, setGroupChats] = useState<GroupChat[]>(INITIAL_GROUP_CHATS);
+  const [claimRequests, setClaimRequests] = useState<ClaimRequest[]>(INITIAL_CLAIM_REQUESTS);
+  const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
   const [appLogo, setAppLogoState] = useState<string>(DEFAULT_APP_LOGO_SVG);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const data = loadStoredData();

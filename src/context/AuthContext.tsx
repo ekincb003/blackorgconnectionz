@@ -9,6 +9,7 @@ import {
   setSavedCurrentUserId,
   clearSavedCurrentUser
 } from '../lib/storage';
+import { INITIAL_USERS } from '../lib/seedData';
 
 export const ALLOWED_STUDENT_EMAIL_DOMAINS = [
   'ucr.edu',
@@ -72,9 +73,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState<User[]>(INITIAL_USERS);
+  const [currentUser, setCurrentUser] = useState<User | null>(INITIAL_USERS[0]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const data = loadStoredData();
