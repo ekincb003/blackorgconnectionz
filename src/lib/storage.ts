@@ -69,40 +69,86 @@ export function loadStoredData(): AppState {
   }
 }
 
+export async function fetchServerData(): Promise<AppState | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const res = await fetch('/api/data', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.success && json.data) {
+      const d = json.data;
+      return {
+        users: d.users || INITIAL_USERS,
+        orgs: d.organizations || INITIAL_ORGS,
+        messages: d.messages || INITIAL_MESSAGES,
+        groupChats: d.groupChats || INITIAL_GROUP_CHATS,
+        claimRequests: d.claimRequests || INITIAL_CLAIM_REQUESTS,
+        notifications: d.notifications || INITIAL_NOTIFICATIONS
+      };
+    }
+  } catch (err) {
+    console.error('Error fetching server data:', err);
+  }
+  return null;
+}
+
+export function syncToServer(data: Partial<{
+  users: User[];
+  organizations: Organization[];
+  messages: ChatMessage[];
+  groupChats: GroupChat[];
+  claimRequests: ClaimRequest[];
+  notifications: Notification[];
+  appLogo: string;
+}>) {
+  if (typeof window === 'undefined') return;
+  fetch('/api/data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch((err) => console.error('Error syncing to server:', err));
+}
+
 export function saveUsers(users: User[]) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
   }
+  syncToServer({ users });
 }
 
 export function saveOrgs(orgs: Organization[]) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.ORGS, JSON.stringify(orgs));
   }
+  syncToServer({ organizations: orgs });
 }
 
 export function saveMessages(messages: ChatMessage[]) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
   }
+  syncToServer({ messages });
 }
 
 export function saveGroupChats(groupChats: GroupChat[]) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.GROUP_CHATS, JSON.stringify(groupChats));
   }
+  syncToServer({ groupChats });
 }
 
 export function saveClaimRequests(claimRequests: ClaimRequest[]) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.CLAIM_REQUESTS, JSON.stringify(claimRequests));
   }
+  syncToServer({ claimRequests });
 }
 
 export function saveNotifications(notifications: Notification[]) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifications));
   }
+  syncToServer({ notifications });
 }
 
 export function resetAllDataToDefault() {
@@ -114,6 +160,14 @@ export function resetAllDataToDefault() {
     localStorage.setItem(STORAGE_KEYS.CLAIM_REQUESTS, JSON.stringify(INITIAL_CLAIM_REQUESTS));
     localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(INITIAL_NOTIFICATIONS));
   }
+  syncToServer({
+    users: INITIAL_USERS,
+    organizations: INITIAL_ORGS,
+    messages: INITIAL_MESSAGES,
+    groupChats: INITIAL_GROUP_CHATS,
+    claimRequests: INITIAL_CLAIM_REQUESTS,
+    notifications: INITIAL_NOTIFICATIONS
+  });
 }
 
 export function getSavedCurrentUserId(): string | null {

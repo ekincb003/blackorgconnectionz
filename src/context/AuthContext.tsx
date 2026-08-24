@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserRole, UserType, CampusAffiliation } from '../types';
 import {
   loadStoredData,
+  fetchServerData,
   saveUsers,
   getSavedCurrentUserId,
   setSavedCurrentUserId,
@@ -81,21 +82,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = loadStoredData();
     setUsers(data.users);
 
-    const savedId = getSavedCurrentUserId();
-    if (savedId) {
-      const found = data.users.find((u) => u.id === savedId);
-      if (found && !found.isSiteBanned) {
-        setCurrentUser(found);
-      } else if (data.users.length > 0) {
-        setCurrentUser(data.users[0]);
-        setSavedCurrentUserId(data.users[0].id);
+    const checkSavedUser = (userList: User[]) => {
+      const savedId = getSavedCurrentUserId();
+      if (savedId) {
+        const found = userList.find((u) => u.id === savedId);
+        if (found && !found.isSiteBanned) {
+          setCurrentUser(found);
+        } else if (userList.length > 0) {
+          setCurrentUser(userList[0]);
+          setSavedCurrentUserId(userList[0].id);
+        }
+      } else if (userList.length > 0) {
+        setCurrentUser(userList[0]); // default to Elijah Kincade
+        setSavedCurrentUserId(userList[0].id);
       }
-    } else if (data.users.length > 0) {
-      setCurrentUser(data.users[0]); // default to Elijah Kincade
-      setSavedCurrentUserId(data.users[0].id);
-    }
+    };
+
+    checkSavedUser(data.users);
+
+    const loadUsersFromServer = async () => {
+      const serverData = await fetchServerData();
+      if (serverData && serverData.users && serverData.users.length > 0) {
+        setUsers(serverData.users);
+      }
+    };
+    loadUsersFromServer();
+
+    const interval = setInterval(loadUsersFromServer, 4000);
+    const onFocus = () => loadUsersFromServer();
+    window.addEventListener('focus', onFocus);
 
     setIsLoading(false);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   const login = (email: string, password?: string, remember30Days: boolean = true) => {

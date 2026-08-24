@@ -22,15 +22,44 @@ import {
   Megaphone,
   Shield,
   Image as ImageIcon,
-  Edit
+  Edit,
+  Cloud,
+  Check
 } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { currentUser, logout } = useAuth();
-  const { messages, appLogo } = useData();
+  const { currentUser, logout, users } = useAuth();
+  const { messages, appLogo, orgs, groupChats, claimRequests, notifications } = useData();
   const [profileOpen, setProfileOpen] = useState(false);
   const [showLogoModal, setShowLogoModal] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    try {
+      await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          users,
+          organizations: orgs,
+          messages,
+          groupChats,
+          claimRequests,
+          notifications,
+          appLogo
+        })
+      });
+      setSyncSuccess(true);
+      setTimeout(() => setSyncSuccess(false), 3000);
+    } catch (err) {
+      console.error('Manual sync failed:', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // Calculate unread direct messages for current user
   const unreadMsgCount = currentUser
@@ -48,7 +77,7 @@ export default function Navbar() {
             <LiveCampusClock />
           </div>
 
-          <div className="flex items-center gap-3 text-[11px] text-neutral-400">
+          <div className="flex items-center gap-2 sm:gap-3 text-[11px] text-neutral-400">
             {currentUser && (
               <div className="hidden sm:flex items-center gap-2">
                 <span className="text-neutral-500">Logged in as:</span>
@@ -61,11 +90,36 @@ export default function Navbar() {
                 </span>
               </div>
             )}
+
+            {/* Instant Manual Cloud Sync Button */}
+            <button
+              type="button"
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition shadow-sm ${
+                syncSuccess
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+              }`}
+              title="Push all your edits to phone & cloud"
+            >
+              {syncSuccess ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Synced to Phone!
+                </>
+              ) : (
+                <>
+                  <Cloud className={`w-3.5 h-3.5 text-gold-400 ${isSyncing ? 'animate-bounce' : ''}`} />
+                  {isSyncing ? 'Syncing...' : 'Sync to Phone'}
+                </>
+              )}
+            </button>
+
             {currentUser?.role === 'super_admin' && (
               <button
                 type="button"
                 onClick={() => setShowLogoModal(true)}
-                className="flex items-center gap-1 text-[11px] text-gold-400 hover:text-gold-300 font-medium px-2 py-0.5 rounded-lg bg-gold-500/10 border border-gold-500/20 transition"
+                className="flex items-center gap-1 text-[11px] text-gold-400 hover:text-gold-300 font-medium px-2 py-1 rounded-lg bg-gold-500/10 border border-gold-500/20 transition"
                 title="Upload or change app logo"
               >
                 <ImageIcon className="w-3 h-3" /> Change App Logo

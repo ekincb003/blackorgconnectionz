@@ -23,6 +23,8 @@ import {
 } from '../types';
 import {
   loadStoredData,
+  fetchServerData,
+  syncToServer,
   saveOrgs,
   saveMessages,
   saveGroupChats,
@@ -144,6 +146,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // 1. Initial local load
     const data = loadStoredData();
     const sortedOrgs = sortOrganizationsByFounding(data.orgs);
     setOrgs(sortedOrgs);
@@ -155,7 +158,31 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     if (savedLogo) {
       setAppLogoState(savedLogo);
     }
+
+    // 2. Fetch from server API
+    const loadFromServer = async () => {
+      const serverData = await fetchServerData();
+      if (serverData) {
+        setOrgs(sortOrganizationsByFounding(serverData.orgs));
+        setMessages(serverData.messages);
+        setGroupChats(serverData.groupChats);
+        setClaimRequests(serverData.claimRequests);
+        setNotifications(serverData.notifications);
+      }
+    };
+    loadFromServer();
+
+    // 3. Periodic real-time sync every 4s + on window focus
+    const interval = setInterval(loadFromServer, 4000);
+    const onFocus = () => loadFromServer();
+    window.addEventListener('focus', onFocus);
+
     setIsLoading(false);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   const updateAppLogo = (logoUrl: string) => {
