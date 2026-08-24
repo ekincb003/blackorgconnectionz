@@ -33,6 +33,7 @@ import {
   resetAllDataToDefault
 } from '../lib/storage';
 import { DEFAULT_APP_LOGO_SVG } from '../lib/defaultAppLogo';
+import { supabase } from '../lib/supabaseClient';
 import {
   sortOrganizationsByFounding,
   INITIAL_ORGS,
@@ -172,7 +173,27 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     };
     loadFromServer();
 
-    // 3. Periodic real-time sync every 4s + on window focus
+    // 3. Supabase Real-time WebSockets Sync
+    const channel = supabase
+      .channel('platform_state_realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'platform_state' },
+        (payload) => {
+          if (payload.new && (payload.new as any).data) {
+            const d = (payload.new as any).data;
+            if (d.organizations) setOrgs(sortOrganizationsByFounding(d.organizations));
+            if (d.messages) setMessages(d.messages);
+            if (d.groupChats) setGroupChats(d.groupChats);
+            if (d.claimRequests) setClaimRequests(d.claimRequests);
+            if (d.notifications) setNotifications(d.notifications);
+            if (d.appLogo) setAppLogoState(d.appLogo);
+          }
+        }
+      )
+      .subscribe();
+
+    // 4. Periodic polling backup every 4s + on window focus
     const interval = setInterval(loadFromServer, 4000);
     const onFocus = () => loadFromServer();
     window.addEventListener('focus', onFocus);
@@ -180,6 +201,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
 
     return () => {
+      supabase.removeChannel(channel);
       clearInterval(interval);
       window.removeEventListener('focus', onFocus);
     };

@@ -127,22 +127,22 @@ function LoginContent() {
   };
 
   return (
-    <div className="max-w-lg mx-auto py-6 px-4 space-y-6">
+    <div className="w-full max-w-md mx-auto pt-2 pb-44 sm:py-8 px-3 sm:px-4 space-y-5">
       {/* Brand Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gold-500/10 border border-gold-500/30 text-gold-400 mb-1">
-          <Sparkles className="w-6 h-6" />
+      <div className="text-center space-y-1.5">
+        <div className="inline-flex items-center justify-center p-2.5 rounded-2xl bg-gold-500/10 border border-gold-500/30 text-gold-400 mb-0.5">
+          <Sparkles className="w-5 h-5" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
           BlackOrg<span className="gold-gradient-text">Connectionz</span>
         </h1>
-        <p className="text-xs sm:text-sm text-neutral-400">
+        <p className="text-xs text-neutral-400 max-w-xs mx-auto">
           The Centralized Campus Hub for Black Student Organizations & NPHC Greek Life
         </p>
       </div>
 
       {/* Main Authentication Card */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl space-y-6">
+      <div className="glass-panel p-5 sm:p-7 rounded-3xl border border-white/10 shadow-2xl space-y-5">
         {/* Navigation Mode Tabs */}
         {mode !== 'forgot' ? (
           <div className="grid grid-cols-2 p-1 rounded-2xl bg-neutral-900/80 border border-white/10">
@@ -261,7 +261,7 @@ function LoginContent() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Jordan Taylor"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-base sm:text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -288,7 +288,7 @@ function LoginContent() {
                       ? 'yourname@ucr.edu or @calbaptist.edu'
                       : 'you@email.com'
                   }
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-base sm:text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -318,7 +318,7 @@ function LoginContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-base sm:text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -334,7 +334,7 @@ function LoginContent() {
                       value={major}
                       onChange={(e) => setMajor(e.target.value)}
                       placeholder="e.g. Political Science"
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-base sm:text-xs placeholder:text-neutral-500 focus:border-gold-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -344,7 +344,7 @@ function LoginContent() {
                   <select
                     value={gradYear}
                     onChange={(e) => setGradYear(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs focus:border-gold-500 focus:outline-none cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-base sm:text-xs focus:border-gold-500 focus:outline-none cursor-pointer"
                   >
                     <option value="2025">2025</option>
                     <option value="2026">2026</option>

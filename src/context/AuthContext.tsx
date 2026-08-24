@@ -11,6 +11,7 @@ import {
   clearSavedCurrentUser
 } from '../lib/storage';
 import { INITIAL_USERS } from '../lib/seedData';
+import { supabase } from '../lib/supabaseClient';
 
 export const ALLOWED_STUDENT_EMAIL_DOMAINS = [
   'ucr.edu',
@@ -108,6 +109,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     loadUsersFromServer();
 
+    // Supabase Real-time WebSockets Sync for users
+    const channel = supabase
+      .channel('platform_users_realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'platform_state' },
+        (payload) => {
+          if (payload.new && (payload.new as any).data && (payload.new as any).data.users) {
+            setUsers((payload.new as any).data.users);
+          }
+        }
+      )
+      .subscribe();
+
     const interval = setInterval(loadUsersFromServer, 4000);
     const onFocus = () => loadUsersFromServer();
     window.addEventListener('focus', onFocus);
@@ -115,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
 
     return () => {
+      supabase.removeChannel(channel);
       clearInterval(interval);
       window.removeEventListener('focus', onFocus);
     };
