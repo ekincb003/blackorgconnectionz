@@ -30,7 +30,8 @@ import {
   saveGroupChats,
   saveClaimRequests,
   saveNotifications,
-  resetAllDataToDefault
+  resetAllDataToDefault,
+  STORAGE_KEYS
 } from '../lib/storage';
 import { DEFAULT_APP_LOGO_SVG } from '../lib/defaultAppLogo';
 import { supabase } from '../lib/supabaseClient';
@@ -164,11 +165,27 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const loadFromServer = async () => {
       const serverData = await fetchServerData();
       if (serverData) {
-        setOrgs(sortOrganizationsByFounding(serverData.orgs));
-        setMessages(serverData.messages);
-        setGroupChats(serverData.groupChats);
-        setClaimRequests(serverData.claimRequests);
-        setNotifications(serverData.notifications);
+        if (serverData.orgs && serverData.orgs.length > 0) {
+          const sorted = sortOrganizationsByFounding(serverData.orgs);
+          setOrgs(sorted);
+          localStorage.setItem(STORAGE_KEYS.ORGS, JSON.stringify(sorted));
+        }
+        if (serverData.messages) {
+          setMessages(serverData.messages);
+          localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(serverData.messages));
+        }
+        if (serverData.groupChats) {
+          setGroupChats(serverData.groupChats);
+          localStorage.setItem(STORAGE_KEYS.GROUP_CHATS, JSON.stringify(serverData.groupChats));
+        }
+        if (serverData.claimRequests) {
+          setClaimRequests(serverData.claimRequests);
+          localStorage.setItem(STORAGE_KEYS.CLAIM_REQUESTS, JSON.stringify(serverData.claimRequests));
+        }
+        if (serverData.notifications) {
+          setNotifications(serverData.notifications);
+          localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(serverData.notifications));
+        }
       }
     };
     loadFromServer();
@@ -182,19 +199,38 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         (payload) => {
           if (payload.new && (payload.new as any).data) {
             const d = (payload.new as any).data;
-            if (d.organizations) setOrgs(sortOrganizationsByFounding(d.organizations));
-            if (d.messages) setMessages(d.messages);
-            if (d.groupChats) setGroupChats(d.groupChats);
-            if (d.claimRequests) setClaimRequests(d.claimRequests);
-            if (d.notifications) setNotifications(d.notifications);
-            if (d.appLogo) setAppLogoState(d.appLogo);
+            if (d.organizations) {
+              const sorted = sortOrganizationsByFounding(d.organizations);
+              setOrgs(sorted);
+              localStorage.setItem(STORAGE_KEYS.ORGS, JSON.stringify(sorted));
+            }
+            if (d.messages) {
+              setMessages(d.messages);
+              localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(d.messages));
+            }
+            if (d.groupChats) {
+              setGroupChats(d.groupChats);
+              localStorage.setItem(STORAGE_KEYS.GROUP_CHATS, JSON.stringify(d.groupChats));
+            }
+            if (d.claimRequests) {
+              setClaimRequests(d.claimRequests);
+              localStorage.setItem(STORAGE_KEYS.CLAIM_REQUESTS, JSON.stringify(d.claimRequests));
+            }
+            if (d.notifications) {
+              setNotifications(d.notifications);
+              localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(d.notifications));
+            }
+            if (d.appLogo) {
+              setAppLogoState(d.appLogo);
+              localStorage.setItem('boc_app_logo', d.appLogo);
+            }
           }
         }
       )
       .subscribe();
 
-    // 4. Periodic polling backup every 4s + on window focus
-    const interval = setInterval(loadFromServer, 4000);
+    // 4. Fast polling backup every 2.5s + on window focus
+    const interval = setInterval(loadFromServer, 2500);
     const onFocus = () => loadFromServer();
     window.addEventListener('focus', onFocus);
 

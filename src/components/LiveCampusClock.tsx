@@ -37,14 +37,18 @@ export default function LiveCampusClock() {
   });
 
   return (
-    <div className="flex items-center gap-2 text-[11px] sm:text-xs font-medium text-neutral-300 bg-black/40 dark:bg-black/40 light:bg-neutral-100 light:text-neutral-700 px-3 py-1.5 rounded-xl border border-white/10 dark:border-white/10 light:border-neutral-300 shadow-sm backdrop-blur-md">
-      <div className="flex items-center gap-1 text-gold-400 font-semibold">
-        <Calendar className="w-3.5 h-3.5 text-gold-400 shrink-0" />
-        <span>{dayName}, {monthName} {numericDate}, {year}</span>
+    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-medium text-neutral-300 bg-black/40 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-white/10 shadow-sm backdrop-blur-md">
+      <div className="flex items-center gap-1 text-gold-400 font-semibold truncate">
+        <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gold-400 shrink-0" />
+        <span>
+          <span className="hidden md:inline">{dayName}, </span>
+          <span>{monthName.slice(0, 3)} {numericDate}</span>
+          <span className="hidden sm:inline">, {year}</span>
+        </span>
       </div>
       <span className="text-neutral-500">•</span>
-      <div className="flex items-center gap-1 text-white dark:text-white light:text-neutral-900 font-bold font-mono">
-        <Clock className="w-3.5 h-3.5 text-gold-400 shrink-0" />
+      <div className="flex items-center gap-1 text-white font-bold font-mono shrink-0">
+        <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gold-400 shrink-0" />
         <span>{timeString}</span>
       </div>
     </div>

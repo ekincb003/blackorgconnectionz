@@ -101,16 +101,16 @@ export default function Navbar() {
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                   : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
               }`}
-              title="Push all your edits to phone & cloud"
+              title="Save & broadcast all edits to all devices via cloud"
             >
               {syncSuccess ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Synced to Phone!
+                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Cloud Synced!
                 </>
               ) : (
                 <>
                   <Cloud className={`w-3.5 h-3.5 text-gold-400 ${isSyncing ? 'animate-bounce' : ''}`} />
-                  {isSyncing ? 'Syncing...' : 'Sync to Phone'}
+                  {isSyncing ? 'Syncing...' : 'Sync to Cloud'}
                 </>
               )}
             </button>
@@ -363,62 +363,62 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-
-        {/* Mobile Sub-Navigation Bar */}
-        <div className="md:hidden flex items-center justify-around py-2.5 border-t border-white/5 bg-neutral-950/95 text-[11px] overflow-x-auto">
-          <Link
-            href="/"
-            className={`flex flex-col items-center py-1 px-2.5 ${
-              isCurrent('/') ? 'text-gold-400 font-bold' : 'text-neutral-400'
-            }`}
-          >
-            <Compass className="w-4 h-4 mb-0.5" /> Orgs
-          </Link>
-          <Link
-            href="/students"
-            className={`flex flex-col items-center py-1 px-2.5 ${
-              isCurrent('/students') ? 'text-gold-400 font-bold' : 'text-neutral-400'
-            }`}
-          >
-            <Users className="w-4 h-4 mb-0.5" /> Students
-          </Link>
-          <Link
-            href="/events"
-            className={`flex flex-col items-center py-1 px-2.5 ${
-              isCurrent('/events') ? 'text-gold-400 font-bold' : 'text-neutral-400'
-            }`}
-          >
-            <Calendar className="w-4 h-4 mb-0.5" /> Events
-          </Link>
-          <Link
-            href="/announcements"
-            className={`flex flex-col items-center py-1 px-2.5 ${
-              isCurrent('/announcements') ? 'text-gold-400 font-bold' : 'text-neutral-400'
-            }`}
-          >
-            <Megaphone className="w-4 h-4 mb-0.5" /> Bulletins
-          </Link>
-          <Link
-            href="/messages"
-            className={`flex flex-col items-center py-1 px-2.5 relative ${
-              isCurrent('/messages') ? 'text-gold-400 font-bold' : 'text-neutral-400'
-            }`}
-          >
-            <MessageSquare className="w-4 h-4 mb-0.5" /> Chats
-            {unreadMsgCount > 0 && (
-              <span className="absolute top-0 right-1 w-2 h-2 bg-gold-500 rounded-full" />
-            )}
-          </Link>
-          <Link
-            href="/profile"
-            className={`flex flex-col items-center py-1 px-2.5 ${
-              isCurrent('/profile') ? 'text-gold-400 font-bold' : 'text-neutral-400'
-            }`}
-          >
-            <User className="w-4 h-4 mb-0.5" /> Profile
-          </Link>
-        </div>
       </header>
+
+      {/* Floating Mobile Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around py-2 border-t border-white/10 bg-neutral-950/95 backdrop-blur-xl text-[11px] shadow-2xl safe-area-bottom">
+        <Link
+          href="/"
+          className={`flex flex-col items-center py-1 px-2.5 transition ${
+            isCurrent('/') ? 'text-gold-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Compass className="w-4 h-4 mb-0.5" /> Orgs
+        </Link>
+        <Link
+          href="/students"
+          className={`flex flex-col items-center py-1 px-2.5 transition ${
+            isCurrent('/students') ? 'text-gold-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Users className="w-4 h-4 mb-0.5" /> Students
+        </Link>
+        <Link
+          href="/events"
+          className={`flex flex-col items-center py-1 px-2.5 transition ${
+            isCurrent('/events') ? 'text-gold-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Calendar className="w-4 h-4 mb-0.5" /> Events
+        </Link>
+        <Link
+          href="/announcements"
+          className={`flex flex-col items-center py-1 px-2.5 transition ${
+            isCurrent('/announcements') ? 'text-gold-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Megaphone className="w-4 h-4 mb-0.5" /> Bulletins
+        </Link>
+        <Link
+          href="/messages"
+          className={`flex flex-col items-center py-1 px-2.5 relative transition ${
+            isCurrent('/messages') ? 'text-gold-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <MessageSquare className="w-4 h-4 mb-0.5" /> Chats
+          {unreadMsgCount > 0 && (
+            <span className="absolute top-0 right-1.5 w-2 h-2 bg-gold-500 rounded-full" />
+          )}
+        </Link>
+        <Link
+          href={currentUser ? "/profile" : "/login"}
+          className={`flex flex-col items-center py-1 px-2.5 transition ${
+            isCurrent('/profile') || isCurrent('/login') ? 'text-gold-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <User className="w-4 h-4 mb-0.5" /> {currentUser ? "Profile" : "Sign In"}
+        </Link>
+      </nav>
 
       {/* App Logo Customization Modal */}
       {showLogoModal && (

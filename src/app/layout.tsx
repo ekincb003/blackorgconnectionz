@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   description: 'Centralized hub for Black student organizations, NPHC Divine Nine Greek life, events, community service, and campus social connection.',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -17,12 +23,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col selection:bg-gold-500 selection:text-black">
+      <body className="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col selection:bg-gold-500 selection:text-black overflow-x-hidden">
         <ThemeProvider>
           <AuthProvider>
             <DataProvider>
               <Navbar />
-              <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-6">
                 {children}
               </main>
               <footer className="border-t border-white/5 bg-neutral-950/80 py-8 text-center text-xs text-neutral-400">

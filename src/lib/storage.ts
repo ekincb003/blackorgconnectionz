@@ -8,7 +8,7 @@ import {
   INITIAL_CLAIM_REQUESTS
 } from './seedData';
 
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
   USERS: 'boc_users_v3',
   ORGS: 'boc_orgs_v3',
   MESSAGES: 'boc_messages_v3',
