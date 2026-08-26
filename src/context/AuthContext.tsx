@@ -76,7 +76,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);
-  const [currentUser, setCurrentUser] = useState<User | null>(INITIAL_USERS[0]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -89,13 +89,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const found = userList.find((u) => u.id === savedId);
         if (found && !found.isSiteBanned) {
           setCurrentUser(found);
-        } else if (userList.length > 0) {
-          setCurrentUser(userList[0]);
-          setSavedCurrentUserId(userList[0].id);
+        } else {
+          setCurrentUser(null);
+          clearSavedCurrentUser();
         }
-      } else if (userList.length > 0) {
-        setCurrentUser(userList[0]); // default to Elijah Kincade
-        setSavedCurrentUserId(userList[0].id);
+      } else {
+        // New visitor starts logged out - they can sign in or create their own account
+        setCurrentUser(null);
       }
     };
 

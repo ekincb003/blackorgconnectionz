@@ -7,6 +7,7 @@ import {
   INITIAL_GROUP_CHATS,
   INITIAL_CLAIM_REQUESTS
 } from './seedData';
+import { supabase } from './supabaseClient';
 
 export const STORAGE_KEYS = {
   USERS: 'boc_users_v3',
@@ -69,8 +70,6 @@ export function loadStoredData(): AppState {
   }
 }
 
-import { supabase } from './supabaseClient';
-
 export async function fetchServerData(): Promise<AppState | null> {
   if (typeof window === 'undefined') return null;
   // 1. Try Supabase Cloud Database
@@ -79,7 +78,7 @@ export async function fetchServerData(): Promise<AppState | null> {
       .from('platform_state')
       .select('data')
       .eq('id', 'main')
-      .single();
+      .maybeSingle();
 
     if (data && data.data) {
       const d = data.data;

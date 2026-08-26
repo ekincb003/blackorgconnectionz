@@ -3,6 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { Upload, Camera, Loader2, Check, Image as ImageIcon } from 'lucide-react';
 import { compressImageFile } from '../lib/imageUtils';
+import { uploadImageToSupabase } from '../lib/supabaseClient';
 
 interface ImageUploadButtonProps {
   label?: string;
@@ -27,6 +28,17 @@ export default function ImageUploadButton({
 
     try {
       setIsProcessing(true);
+
+      // 1. Try uploading to Supabase Cloud Storage (Platform Media Bucket)
+      const cloudUrl = await uploadImageToSupabase(file, imageType);
+      if (cloudUrl) {
+        onImageUploaded(cloudUrl);
+        setIsSuccess(true);
+        setTimeout(() => setIsSuccess(false), 2500);
+        return;
+      }
+
+      // 2. Fallback to optimized compressed Data URL
       const maxWidth = imageType === 'banner' ? 1600 : imageType === 'avatar' ? 600 : 1200;
       const maxHeight = imageType === 'banner' ? 800 : imageType === 'avatar' ? 600 : 900;
 
